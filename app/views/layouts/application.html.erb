@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>실시간 알림 구현</title>
+    <%= csrf_meta_tags %>
+	<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/earlyaccess/notosanskr.css">
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+		<style>
+			body {
+				display: flex;
+				height: 100vh;
+				flex-direction: column;
+				font-family: 'Noto Sans KR', sans-serif;
+				font-weight: 300 !important;
+				list-style: none;
+				background-color: #eff1f5;
+			}
+			
+			body > section {
+				flex: 1 0 auto;
+				padding-top: 40px;
+			}
+			
+			.footer {
+				flex-shrink: 0;
+			}
+			
+			.footer .seperator {
+				max-width: 80%;
+				border-top: 1px solid rgba(0, 0, 0, 0.1);
+				border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+				margin-bottom: 0;
+			}
+			
+			body ul {
+				list-style: none;
+			}
+			
+			.nav-item-seperator {
+				padding-right: 15px;
+				padding-left: 15px;
+			}
+
+			.nav-item-seperator::before {
+				content: '';
+				height: 50%;
+				border-right: 1px solid rgba(0, 0, 0, 0.2);
+				float: right;
+				position: absolute;
+				left: 100%;
+				top: 50%;
+				transform: translateY(-50%);
+			}
+
+			.dropdown-toggle::after {
+				vertical-align: initial;
+			}
+			
+			span.noti-circle.red-dot {
+				border-radius: 50%;
+				background-color: red;
+				width: 10px;
+				height: 10px;
+				display: inline-block;
+				float: right;
+				position: absolute;
+				top: 10px;
+				left: 40px;
+				border: 1px solid white;
+			}
+			
+			a.list-group-item.list-group-item-action.read {
+				color: darkgrey;
+			}
+			
+			a.list-group-item.list-group-item-action.unread {
+				color: black;
+			}
+			
+			.noti-dropdown {
+				font-size: 15px;
+			}
+			
+			table.noti-table td {
+				padding: 5px 20px;
+			}
+			
+			ul.list-group {
+				max-height: 500px;
+				overflow-y: scroll;
+				-webkit-overflow-scrolling: touch;
+			}
+			
+			a.list-group-item {
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				max-width: 20rem;
+			}
+		</style>
+  </head>
+
+  <body>
+		<% if user_signed_in? %>
+		<script>
+			function notiClicked() {
+				var t = document.getElementById('noti-list');
+				t.innerHTML = '';
+				fetch("/getMyNoti", {
+					method: "GET",
+					dataType : 'json'
+				}).then(function(response) {
+					if (response.ok) {
+						response.json().then(function(data) {
+							for(var i = 0; i < data.length; i++) {
+								if(data[i].confirmed)
+									t.innerHTML += "<a class='list-group-item list-group-item-action read' target='_parent' href='/posts/" + data[i].post_id + "'>" +
+																	data[i].title +
+																	'</a>'
+								else
+									t.innerHTML += "<a class='list-group-item list-group-item-action unread' target='_parent' href='/posts/" + data[i].post_id + "'>" +
+																	data[i].title +
+																	'</a>'
+							}
+							if(!data.length) t.innerHTML += "<img src='/assets/_____.png' style='width: 18rem'>";
+						});
+					}
+				}, function(e) {
+					alert("알 수 없는 에러가 발생하였습니다. 상태가 지속된다면 관리자에게 문의하세요!");
+				});
+			}
+			
+			function notiDelete() {
+				var t = document.getElementById('noti-list');
+				t.innerHTML = '';
+				fetch("/getMyNoti", {
+					method: "GET",
+					dataType : 'text'
+				}).then(function(response) {
+					if (response.ok) {
+						response.text().then(function(data) {
+							
+						});
+					}
+				}, function(e) {
+					alert("알 수 없는 에러가 발생하였습니다. 상태가 지속된다면 관리자에게 문의하세요!");
+				});
+			}
+		</script>
+		<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
+			<div class="container">
+				<a class="navbar-brand d-flex" href="<%= root_path %>" target="_parent">
+					<img src="/assets/notification.svg" class="d-inline-block align-top mr-2" width="30" height="30">
+					<span class="brand-text">Realtime-Notification</span>
+				</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarNavDropdown">
+					<ul class="navbar-nav ml-auto">
+						<li class="nav-item dropdown active nav-item-seperator">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<span class="align-middle">안녕하세요,
+									<strong><%= current_user.email.split('@')[0] %>님</strong>
+								</span>
+							</a>
+							<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+								<a class="dropdown-item" href="<%= destroy_user_session_path %>" data-method="DELETE">로그아웃</a>
+							</div>
+						</li>
+						<li class="nav-item dropdown active nav-item-seperator">
+							<a class="nav-link" href="#" onclick="notiClicked()" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<img src="/assets/icons8-notification-30.png" class="d-inline-block" width="25">
+								<span class="noti-circle"></span>
+							</a>
+							<div class="noti-dropdown dropdown-menu pt-0 shadow" aria-labelledby="navbarDropdown">
+								<div style="width: 20rem; margin: 0">
+									<table class="noti-table" style="width: 100%;">
+										<tbody>
+											<tr>
+												<td><span>알림</span></td>
+												<td class="text-right"><a href="/deleteMyNoti" class="text-info" data-confirm="모든 알림을 삭제하시겠습니까?" data-method="DELETE"><i class="material-icons align-bottom">clear_all</i></a></td>
+											</tr>
+										</tbody>
+									</table>
+									<ul id="noti-list" class="list-group list-group-flush">
+									</ul>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<% end %>
+		<section>
+			<%= yield %>
+		</section>
+		<footer class="footer">
+			<hr class="seperator mb-2">
+			<div class="footer-inner">
+				<div class="container">
+					<div class="information">
+						<ul class="d-flex">
+							<li>
+								<div class="copyright text-dark">
+									© 2018 knight7024@naver.com, All Rights Reserved.
+								</div>
+							</li>
+							<li class="ml-auto">
+								<div class="copyright text-dark">
+									<div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" 			    title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" 			    title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</footer>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  </body>
+</html>

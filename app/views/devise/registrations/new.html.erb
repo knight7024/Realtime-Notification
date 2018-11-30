@@ -1,0 +1,69 @@
+<style>
+    li {
+        list-style: none;
+    }
+    
+    ul {
+        display: inline-block;
+        padding-left: 5px;
+    }
+    
+    .card {
+        position: absolute;
+        min-width: 450px;
+        width: 450px;
+        height: 450px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
+    .card-body {
+        text-align: center;
+    }
+    
+    .card-body.form-group,  .card-body.input-group {
+        max-width: 300px;
+    }
+    
+     .card-body.form-group btn {
+        width: 300px;
+    }
+    
+    .card-footer {
+        background-color: transparent;
+        font-size: small;
+    }
+    
+    .separator::before {
+        content: '';
+        border-right: 1px solid rgba(0,0,0,.25);
+    }
+</style>
+<div class="card shadow-lg p-3 mb-5 bg-white rounded">
+	<%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+		<div class="card-body mb-5">
+			<%= f.error_notification %>
+			<div class="sign_in mb-4">
+				<i class="material-icons text-info" style="font-size: 3em">lock_open</i>
+			</div>
+			<div class="form-group mx-auto mb-4">
+				<%= f.email_field :email, :required => true, :input_html => { :autocomplete => "email" }, :class => 'form-control validate font-weight-light', :placeholder => 'E-Mail' %>
+			</div>
+			<div class="form-group mx-auto mb-4">
+				<%= f.password_field :password, :required => true, :input_html => { :autocomplete => "off" }, :class => 'form-control validate font-weight-light', :placeholder => 'Password' %>
+			</div>
+			<div class="form-group mx-auto mb-4">
+				<%= f.password_field :password_confirmation, :required => true, :input_html => { :autocomplete => "off" }, :class => 'form-control validate font-weight-light', :placeholder => 'Password Confirmation' %>
+			</div>
+			<div class="form-group mx-auto mb-5">
+				<%= f.button :submit, "회원가입", :class => 'btn btn-outline-info btn-block font-weight-light' %>
+			</div>
+			<div class="card-footer">
+				<li class="mt-1">
+					<%= render "devise/shared/links" %>
+				</li>
+			</div>
+		</div>
+	<% end %>
+</div>

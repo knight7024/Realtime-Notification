@@ -1,0 +1,76 @@
+<style>
+	.table {
+		color: white;
+	}
+	
+	.table thead th {
+		border-color: transparent;
+	}
+
+	.table	tbody tr {
+		font-size: x-large;
+		cursor: pointer;
+		transition: .3s ease;
+	}
+
+	.table	tbody tr:hover {
+		background-color: RGBA(236, 240, 241, 0.3);
+	}
+	
+	.table th {
+		font-weight: 300;
+	}
+	
+	table.table.matching-table {
+		width: 100%;
+		background-color: RGBA(23, 162, 184, 0.6);
+		border: 0;
+		border-radius: 3px;
+	}
+	
+	.table .table-first, .table .table-third, .table .table-fourth {
+		width: 20%;
+	}
+	
+	.table .table-second {
+		width: 40%;
+	}
+	
+	a.btn.btn-light.post-btn {
+		border: 1px solid rgba(0, 0, 0, 0.2);
+	}
+</style>
+<script>
+	function windowLocation(id) {
+		window.location.href ="/posts/" + id;
+	}
+</script>
+<div class="container" style="margin-top: 2em;">
+	<div class="form-button text-left">
+		<a href="<%= post_path %>" role="button" class="btn btn-light post-btn mb-2" target="_parent">
+			<i class="material-icons" style="font-size: 20px; vertical-align: sub">edit</i> 글쓰기
+		</a>
+	</div>
+	<section>
+		<table class="table matching-table">
+			<thead>
+				<tr>
+					<th scope="col" class="table-first">글 번호</th>
+					<th scope="col" class="table-second">제목</th>
+					<th scope="col" class="table-third">작성자</th>
+					<th scope="col" class="table-fourth">작성 일자</th>
+				</tr>
+			</thead>
+			<tbody class="matching-tbody">
+				<% @post.reverse.each do |p| %>
+					<tr class="table-row" id="table-row-<%= p.id %>" onclick="windowLocation(<%= p.id %>)">
+						<th class="table-first" scope="row"><%= p.id %></th>
+						<td class="table-second"><%= p.title %></td>
+						<td class="table-third"><%= @user.find(p.user_id).email.split('@')[0] %></td>
+						<td class="table-fourth"><%= p.created_at.in_time_zone('Seoul').strftime('%F') %></td>
+					</tr>
+				<% end %>
+			</tbody>
+		</table>
+	</section>
+</div>
