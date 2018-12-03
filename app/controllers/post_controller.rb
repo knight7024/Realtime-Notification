@@ -37,7 +37,8 @@ class PostController < ApplicationController
 		comment.user_id = current_user.id
 		comment.ip_address = request.remote_ip
 		if comment.save
-			redirect_back(fallback_location: root_path)
+			redirect_to :back
+			#redirect_back(fallback_location: root_path)
 		end
 	end
 	
@@ -64,6 +65,7 @@ class PostController < ApplicationController
 		noti.each do |n|
 			n.destroy
 		end
-		redirect_back(fallback_location: root_path)
+		redirect_to root_path
+		#redirect_back(fallback_location: root_path)
 	end
 end
